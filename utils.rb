@@ -18,3 +18,27 @@ options[:region] = $SMS_REGION
 
 # Now, set the options
 AWS.config(options) 
+
+
+# Registers the domain that the workflow will run in.
+def init_domain
+  domain_name = 'MarketPlace'
+  domain = nil
+  swf = AWS::SimpleWorkflow.new
+
+  # First, check to see if the domain already exists and is registered.
+  swf.domains.registered.each do | d |
+    if(d.name == domain_name)
+      domain = d
+      break
+    end
+  end
+
+  if domain.nil?
+    # Register the domain for one day.
+    domain = swf.domains.create(
+      domain_name, 1, { :description => "#{domain_name} domain" })
+  end
+
+  return domain
+end
